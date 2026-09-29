@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Les Workflows Git</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      padding: 2rem;
+      max-width: 1000px;
+      margin-inline: auto;
+    }
+
+    h1, h2, h3 {
+      line-height: 1.25;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace;
+      font-size: 0.95em;
+    }
+
+    pre {
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      background: rgba(127, 127, 127, 0.12);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+
+    th, td {
+      border: 1px solid rgba(127, 127, 127, 0.35);
+      padding: 0.6rem;
+      text-align: left;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    hr {
+      margin: 2rem 0;
+      border: none;
+      border-top: 1px solid rgba(127, 127, 127, 0.35);
+    }
+  </style>
+</head>
+<body>
+  <h1>Les Workflows Git</h1>
+
+  <h2>Introduction</h2>
+  <p>
+    Un workflow Git est un ensemble de recommandations et de processus pour utiliser Git de manière efficace en équipe.
+    Il définit comment les branches sont créées, nommées, fusionnées et supprimées au sein d'un projet.
+  </p>
+
+  <h2>Pourquoi un workflow est important ?</h2>
+  <ul>
+    <li><strong>Collaboration</strong>: Facilite le travail en équipe sans conflits</li>
+    <li><strong>Traçabilité</strong>: Maintient un historique clair et organisé</li>
+    <li><strong>Qualité</strong>: Permet de mettre en place des contrôles de qualité</li>
+    <li><strong>Déploiement</strong>: Automatise les processus de release et de production</li>
+  </ul>
+
+  <hr>
+
+  <h2>1. Git Flow</h2>
+  <h3>Concept</h3>
+  <p>Git Flow est un workflow rigoureux avec deux branches principales et plusieurs branches de support.</p>
+
+  <h3>Branches principales</h3>
+  <ul>
+    <li><strong>main (master)</strong>: Contient le code stable, prêt pour la production</li>
+    <li><strong>develop</strong>: Branche d'intégration pour les développements</li>
+  </ul>
+
+  <h3>Branches de support</h3>
+  <ul>
+    <li><strong>feature/</strong> : Pour développer de nouvelles fonctionnalités</li>
+    <li><strong>release/</strong> : Pour préparer une nouvelle version</li>
+    <li><strong>hotfix/</strong> : Pour corriger les bugs en production</li>
+  </ul>
+
+  <h3>Flux de travail</h3>
+  <pre><code>1. Créer une branche feature à partir de develop
+   git checkout -b feature/ma-fonctionnalite develop
+
+2. Développer et commiter
+   git add .
+   git commit -m "feat: add new feature"
+
+3. Créer une pull request (PR) sur develop
+4. Après approbation et test, fusionner dans develop
+5. Créer une branche release quand prêt
+   git checkout -b release/1.0.0 develop
+
+6. Tester et corriger les bugs si nécessaire
+7. Fusionner dans main et develop
+8. Taguer la release
+   git tag -a v1.0.0 -m "Version 1.0.0"</code></pre>
+
+  <h3>Avantages</h3>
+  <ul>
+    <li>Structure claire et prévisible</li>
+    <li>Gestion explicite des versions</li>
+  </ul>
+
+  <h3>Inconvénients</h3>
+  <ul>
+    <li>Complexe pour les petites équipes</li>
+    <li>Plus de branches à gérer</li>
+  </ul>
+
+  <hr>
+
+  <h2>2. GitHub Flow</h2>
+  <h3>Concept</h3>
+  <p>GitHub Flow est un workflow simplifié et agile, idéal pour les déploiements continus.</p>
+
+  <h3>Branches</h3>
+  <ul>
+    <li><strong>main</strong>: Contient le code stable</li>
+    <li><strong>feature branches</strong>: Branches temporaires pour chaque fonctionnalité</li>
+  </ul>
+
+  <h3>Flux de travail</h3>
+  <pre><code>1. Créer une branche feature à partir de main
+   git checkout -b feature/ma-fonctionnalite
+
+2. Développer localement
+   git add .
+   git commit -m "feat: description"
+   git push origin feature/ma-fonctionnalite
+
+3. Créer une Pull Request sur GitHub
+
+4. Discussion et review du code
+
+5. Une fois approuvée, fusionner dans main
+   git checkout main
+   git pull origin main
+   git merge --no-ff feature/ma-fonctionnalite
+   git push origin main
+
+6. Supprimer la branche
+   git branch -d feature/ma-fonctionnalite
+   git push origin --delete feature/ma-fonctionnalite</code></pre>
+
+  <h3>Avantages</h3>
+  <ul>
+    <li>Simple et facile à comprendre</li>
+    <li>Idéal pour le déploiement continu</li>
+    <li>Moins de branches à maintenir</li>
+  </ul>
+
+  <h3>Inconvénients</h3>
+  <ul>
+    <li>Moins de structure pour les grandes équipes</li>
+    <li>Nécessite une CI/CD robuste</li>
+  </ul>
+
+  <hr>
+
+  <h2>3. GitLab Flow</h2>
+  <h3>Concept</h3>
+  <p>GitLab Flow combine la simplicité de GitHub Flow avec la structure de Git Flow.</p>
+
+  <h3>Branches</h3>
+  <ul>
+    <li><strong>main</strong>: Code de production</li>
+    <li><strong>Branches environnement</strong>: pre-production, staging, etc.</li>
+    <li><strong>Feature branches</strong>: Pour les développements</li>
+  </ul>
+
+  <h3>Flux de travail</h3>
+  <pre><code>1. Créer une branche feature depuis main
+   git checkout -b feature/ma-fonctionnalite
+
+2. Développer et faire des commits
+
+3. Créer une Merge Request
+
+4. Une fois approuvée, fusionner dans main
+
+5. Le code est automatiquement déployé en staging
+
+6. Si les tests passent, déployer manuellement ou automatiquement en production</code></pre>
+
+  <h3>Avantages</h3>
+  <ul>
+    <li>Flexibilité avec gestion d'environnements</li>
+    <li>Plus simple que Git Flow</li>
+    <li>Bon pour les déploiements par environnement</li>
+  </ul>
+
+  <hr>
+
+  <h2>4. Trunk-Based Development</h2>
+  <h3>Concept</h3>
+  <p>
+    Tous les développeurs travaillent sur une seule branche (main/trunk) avec des commits fréquents et des
+    feature flags pour les fonctionnalités incomplètes.
+  </p>
+
+  <h3>Flux de travail</h3>
+  <pre><code>1. Créer une branche courte durée depuis main
+   git checkout -b feature-courte-duree
+
+2. Développer et commiter rapidement (en quelques heures)
+
+3. Fusionner rapidement dans main avec des tests
+   git checkout main
+   git merge feature-courte-duree
+
+4. Utiliser des feature flags pour les fonctionnalités incomplètes
+   if (isFeatureEnabled('NEW_FEATURE')) {
+     // Code de la nouvelle fonctionnalité
+   }</code></pre>
+
+  <h3>Avantages</h3>
+  <ul>
+    <li>Peu de conflits de fusion</li>
+    <li>Déploiement très fréquent</li>
+    <li>Meilleure intégration continue</li>
+  </ul>
+
+  <h3>Inconvénients</h3>
+  <ul>
+    <li>Nécessite une excellente CI/CD</li>
+    <li>Discipline stricte requise</li>
+    <li>Complexité des feature flags</li>
+  </ul>
+
+  <hr>
+
+  <h2>Bonnes pratiques communes</h2>
+
+  <h3>1. Nommage des branches</h3>
+  <p>Utiliser une convention cohérente :</p>
+  <pre><code>feature/description-de-la-fonctionnalite
+bugfix/description-du-bug
+hotfix/description-de-la-correction
+docs/description-des-docs
+refactor/description-du-refactoring</code></pre>
+
+  <h3>2. Commits clairs</h3>
+  <pre><code>Commandes :
+git add .
+git commit -m "type: description courte"
+
+Types recommandés :
+- feat: Nouvelle fonctionnalité
+- fix: Correction de bug
+- docs: Modification de documentation
+- style: Formatage, pas de logique modifiée
+- refactor: Refactorisation du code
+- perf: Amélioration de performance
+- test: Ajout de tests</code></pre>
+
+  <h3>3. Pull Requests efficaces</h3>
+  <pre><code>- Garder les PR petites et focalisées
+- Écrire une description claire
+- Répondre aux commentaires rapidement
+- Demander des reviews à des collègues
+- Utiliser les checklists</code></pre>
+
+  <h3>4. Fusion des branches</h3>
+  <pre><code>Utiliser --no-ff pour garder une trace :
+git merge --no-ff feature/ma-fonctionnalite
+
+Ou utiliser squash pour un historique propre :
+git merge --squash feature/ma-fonctionnalite</code></pre>
+
+  <h3>5. Synchronisation avec main</h3>
+  <pre><code>Récupérer les derniers changements :
+git fetch origin
+git rebase origin/main
+
+Ou merger si vous préférez :
+git merge origin/main</code></pre>
+
+  <hr>
+
+  <h2>Choisir son workflow</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Workflow</th>
+        <th>Équipe</th>
+        <th>Projet</th>
+        <th>Déploiement</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Git Flow</strong></td>
+        <td>Grande équipe</td>
+        <td>Grandes versions</td>
+        <td>Planifié</td>
+      </tr>
+      <tr>
+        <td><strong>GitHub Flow</strong></td>
+        <td>Petite/moyenne</td>
+        <td>Continu</td>
+        <td>Continu</td>
+      </tr>
+      <tr>
+        <td><strong>GitLab Flow</strong></td>
+        <td>Moyenne/grande</td>
+        <td>Complexe</td>
+        <td>Multi-env</td>
+      </tr>
+      <tr>
+        <td><strong>Trunk-Based</strong></td>
+        <td>Expérimentée</td>
+        <td>Haute fréquence</td>
+        <td>Continu</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Ressources supplémentaires</h2>
+  <ul>
+    <li><a href="https://danielkummer.github.io/git-flow-cheatsheet/">Git Flow cheatsheet</a></li>
+    <li><a href="https://guides.github.com/introduction/flow/">GitHub Flow guide</a></li>
+    <li><a href="https://www.conventionalcommits.org/">Conventional Commits</a></li>
+    <li><a href="https://chris.beams.io/posts/git-commit/">Commit Message Best Practices</a></li>
+  </ul>
+</body>
+</html>
