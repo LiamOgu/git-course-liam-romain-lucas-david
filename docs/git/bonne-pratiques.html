@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bonnes pratiques Git</title>
+  <style>
+    :root {
+      --bg: #f7f7f5; --surface: #ffffff; --text: #1f2328; --muted: #59636e;
+      --border: #d8dee4; --accent: #f05033; --code-bg: #f1f3f5;
+      --warn-bg: #fff4e5; --warn-border: #f0a202;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f1115; --surface: #171a21; --text: #e6e8eb; --muted: #9aa4af;
+        --border: #2d333b; --accent: #ff7a5c; --code-bg: #1f242c;
+        --warn-bg: #2a2214; --warn-border: #c98a00;
+      }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.6; }
+    header { background: var(--surface); border-bottom: 3px solid var(--accent); padding: 2rem 1rem; text-align: center; }
+    header h1 { margin: 0 0 .3rem; font-size: 2rem; }
+    header p { margin: 0; color: var(--muted); }
+    .container { max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+    nav { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 2rem; }
+    nav h2 { margin-top: 0; font-size: 1.1rem; }
+    nav ol { margin: 0; padding-left: 1.2rem; columns: 2; }
+    nav a { color: var(--accent); text-decoration: none; }
+    nav a:hover { text-decoration: underline; }
+    section { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem 1.5rem; margin-bottom: 1.5rem; }
+    h2 { color: var(--accent); margin-top: 0; }
+    h3 { margin-bottom: .4rem; }
+    code { font-family: Consolas, "Courier New", monospace; background: var(--code-bg); padding: .1rem .35rem; border-radius: 4px; font-size: .92em; }
+    pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; padding: .9rem 1rem; overflow-x: auto; }
+    pre code { background: none; padding: 0; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin: .8rem 0; }
+    th, td { border: 1px solid var(--border); padding: .5rem .7rem; text-align: left; }
+    th { background: var(--code-bg); }
+    .warning { background: var(--warn-bg); border-left: 4px solid var(--warn-border); padding: .7rem 1rem; border-radius: 4px; margin: 1rem 0; }
+    .checklist { list-style: none; padding-left: 0; }
+    .checklist li { padding: .3rem 0; }
+    .checklist input { margin-right: .5rem; }
+    footer { text-align: center; color: var(--muted); font-size: .9rem; margin-top: 2rem; }
+    @media (max-width: 600px) { nav ol { columns: 1; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Bonnes pratiques Git</h1>
+  <p>Les règles à suivre pour travailler proprement, seul ou en équipe</p>
+</header>
+
+<div class="container">
+
+  <nav>
+    <h2>Sommaire</h2>
+    <ol>
+      <li><a href="#config">Configuration de départ</a></li>
+      <li><a href="#commits">Les commits</a></li>
+      <li><a href="#branches">Les branches</a></li>
+      <li><a href="#sync">Synchronisation</a></li>
+      <li><a href="#gitignore">Le fichier .gitignore</a></li>
+      <li><a href="#securite">Sécurité</a></li>
+      <li><a href="#annuler">Annuler proprement</a></li>
+      <li><a href="#equipe">Travail en équipe</a></li>
+      <li><a href="#readme">Le README</a></li>
+      <li><a href="#memo">Mémo du quotidien</a></li>
+      <li><a href="#checklist">Checklist avant push</a></li>
+    </ol>
+  </nav>
+
+  <section id="config">
+    <h2>1. Configuration de départ</h2>
+    <p>Avant le premier commit, configurer son identité :</p>
+    <pre><code>git config --global user.name "Prénom Nom"
+git config --global user.email "prenom.nom@email.com"
+git config --global init.defaultBranch main</code></pre>
+    <p>Vérifier la configuration :</p>
+    <pre><code>git config --list</code></pre>
+  </section>
+
+  <section id="commits">
+    <h2>2. Les commits</h2>
+
+    <h3>Faire des petits commits</h3>
+    <p>Un commit = une modification logique. On évite les commits du type « tout le travail de la journée ».</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>À éviter</th><th>À privilégier</th></tr>
+        <tr><td>Un commit qui modifie 30 fichiers pour 4 sujets différents</td><td>4 commits, un par sujet</td></tr>
+        <tr><td>Commiter du code qui ne compile pas</td><td>Commiter du code qui fonctionne</td></tr>
+      </table>
+    </div>
+
+    <h3>Vérifier avant de commiter</h3>
+    <pre><code>git status
+git diff --staged</code></pre>
+
+    <h3>Écrire des messages clairs</h3>
+    <ul>
+      <li>au présent ou à l'impératif : <code>Ajoute</code>, <code>Corrige</code>, <code>Supprime</code></li>
+      <li>court (50 caractères environ pour la première ligne)</li>
+      <li>dit <strong>ce qui change</strong>, pas « modif » ou « update »</li>
+    </ul>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Mauvais message</th><th>Bon message</th></tr>
+        <tr><td><code>modif</code></td><td><code>Corrige le calcul du total TTC</code></td></tr>
+        <tr><td><code>test</code></td><td><code>Ajoute les tests du service utilisateur</code></td></tr>
+        <tr><td><code>fix bug</code></td><td><code>Corrige l'erreur 500 à la connexion</code></td></tr>
+      </table>
+    </div>
+
+    <h3>Convention « Conventional Commits »</h3>
+    <pre><code>&lt;type&gt;(&lt;portée&gt;) : &lt;description&gt;</code></pre>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Type</th><th>Usage</th></tr>
+        <tr><td><code>feat</code></td><td>Nouvelle fonctionnalité</td></tr>
+        <tr><td><code>fix</code></td><td>Correction de bug</td></tr>
+        <tr><td><code>docs</code></td><td>Documentation</td></tr>
+        <tr><td><code>style</code></td><td>Mise en forme, sans changement de logique</td></tr>
+        <tr><td><code>refactor</code></td><td>Réorganisation du code sans changer son comportement</td></tr>
+        <tr><td><code>test</code></td><td>Ajout ou modification de tests</td></tr>
+        <tr><td><code>chore</code></td><td>Maintenance (dépendances, configuration)</td></tr>
+      </table>
+    </div>
+    <pre><code>feat(connexion) : ajoute la page de connexion
+fix(dates) : corrige l'affichage des dates
+docs(readme) : met à jour le README</code></pre>
+  </section>
+
+  <section id="branches">
+    <h2>3. Les branches</h2>
+
+    <h3>Ne jamais travailler directement sur main</h3>
+    <p><code>main</code> contient le code stable. Chaque fonctionnalité ou correctif se fait sur sa propre branche, créée depuis <code>develop</code>.</p>
+    <pre><code>git switch develop
+git pull
+git switch -c feature/page-connexion</code></pre>
+
+    <h3>Nommer ses branches</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Préfixe</th><th>Usage</th><th>Exemple</th></tr>
+        <tr><td><code>feature/</code></td><td>Nouvelle fonctionnalité</td><td><code>feature/panier</code></td></tr>
+        <tr><td><code>fix/</code></td><td>Correction de bug</td><td><code>fix/login-erreur-500</code></td></tr>
+        <tr><td><code>hotfix/</code></td><td>Correction urgente en production</td><td><code>hotfix/paiement</code></td></tr>
+        <tr><td><code>docs/</code></td><td>Documentation</td><td><code>docs/readme</code></td></tr>
+      </table>
+    </div>
+    <p>Noms en minuscules, mots séparés par des tirets, sans accents ni espaces.</p>
+
+    <h3>Garder des branches courtes</h3>
+    <p>Une branche qui vit trois semaines accumule les conflits. On fusionne souvent, par petits morceaux.</p>
+
+    <h3>Supprimer les branches fusionnées</h3>
+    <pre><code>git branch -d feature/page-connexion
+git push origin --delete feature/page-connexion</code></pre>
+  </section>
+
+  <section id="sync">
+    <h2>4. Synchronisation avec le dépôt distant</h2>
+
+    <h3>Récupérer avant d'envoyer</h3>
+    <pre><code>git pull
+git push</code></pre>
+    <p>Toujours faire un <code>pull</code> avant un <code>push</code> pour intégrer le travail des autres.</p>
+
+    <h3>Mettre à jour sa branche avec develop</h3>
+    <pre><code>git switch develop
+git pull
+git switch feature/ma-branche
+git merge develop</code></pre>
+
+    <h3>Nettoyer les branches distantes supprimées</h3>
+    <pre><code>git fetch --prune</code></pre>
+  </section>
+
+  <section id="gitignore">
+    <h2>5. Le fichier .gitignore</h2>
+    <p>À créer <strong>dès le début</strong> du projet, à la racine. Ce qu'on n'envoie jamais :</p>
+    <ul>
+      <li>les dépendances : <code>node_modules/</code>, <code>vendor/</code>, <code>venv/</code></li>
+      <li>les fichiers compilés : <code>bin/</code>, <code>obj/</code>, <code>dist/</code>, <code>__pycache__/</code></li>
+      <li>la configuration locale : <code>.env</code>, <code>.vscode/</code>, <code>.idea/</code></li>
+      <li>les fichiers système : <code>.DS_Store</code>, <code>Thumbs.db</code></li>
+      <li>les logs : <code>*.log</code></li>
+    </ul>
+    <pre><code># Dépendances
+node_modules/
+venv/
+
+# Fichiers compilés
+dist/
+bin/
+obj/
+__pycache__/
+
+# Configuration locale
+.env
+.vscode/
+.idea/
+
+# Système
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log</code></pre>
+    <p>Des modèles prêts à l'emploi existent sur <a href="https://github.com/github/gitignore">github.com/github/gitignore</a>.</p>
+  </section>
+
+  <section id="securite">
+    <h2>6. Sécurité</h2>
+
+    <h3>Ne jamais commiter de secrets</h3>
+    <p>Mots de passe, clés d'API, tokens, identifiants de base de données : tout ça va dans un fichier <code>.env</code> ignoré par Git. On versionne à la place un fichier <code>.env.example</code> sans les vraies valeurs :</p>
+    <pre><code>DB_HOST=localhost
+DB_USER=
+DB_PASSWORD=</code></pre>
+
+    <div class="warning">
+      <strong>Secret poussé par erreur ?</strong> Le supprimer dans un nouveau commit ne suffit pas : il reste dans l'historique. Il faut changer le mot de passe ou révoquer la clé immédiatement.
+    </div>
+  </section>
+
+  <section id="annuler">
+    <h2>7. Annuler proprement</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Situation</th><th>Commande</th></tr>
+        <tr><td>Annuler les modifications d'un fichier</td><td><code>git restore fichier</code></td></tr>
+        <tr><td>Retirer un fichier du staging</td><td><code>git restore --staged fichier</code></td></tr>
+        <tr><td>Modifier le dernier commit (non poussé)</td><td><code>git commit --amend</code></td></tr>
+        <tr><td>Annuler un commit déjà poussé</td><td><code>git revert &lt;id&gt;</code></td></tr>
+        <tr><td>Annuler un commit local</td><td><code>git reset --soft HEAD~1</code></td></tr>
+      </table>
+    </div>
+    <div class="warning">
+      <strong>Règle d'or :</strong> on ne réécrit jamais l'historique d'une
+      
