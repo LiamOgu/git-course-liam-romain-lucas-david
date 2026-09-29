@@ -252,6 +252,42 @@ git stash apply           # réappliquer sans le supprimer
 git stash drop stash@{0}  # supprimer un stash précis</code></pre>
     </section>
 
+    <section id="head-detache">
+      <h2>HEAD détaché</h2>
+      <p>Message <code>You are in 'detached HEAD' state</code> : tu as fait un <code>checkout</code> sur un commit ou un tag précis, pas sur une branche.</p>
+      <ul>
+        <li>Tu voulais juste regarder : <code>git switch -</code> (ou <code>git checkout develop</code>) pour revenir.</li>
+        <li>Tu as fait du travail à garder : <code>git switch -c ma-branche</code> crée une branche depuis cet état et sauve tes commits.</li>
+      </ul>
+    </section>
+
+    <section id="erreurs">
+      <h2>Erreurs courantes</h2>
+      <table>
+        <thead>
+          <tr><th>Message</th><th>Cause</th><th>Solution</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>Updates were rejected... fetch first</code></td><td>Le remote a des commits que tu n'as pas</td><td><code>git pull --rebase</code> puis <code>git push</code></td></tr>
+          <tr><td><code>Please commit your changes or stash them</code></td><td>Fichiers modifiés qui bloquent un <code>switch</code>/<code>pull</code></td><td><code>git stash</code>, faire l'opération, <code>git stash pop</code></td></tr>
+          <tr><td><code>fatal: not a git repository</code></td><td>Tu n'es pas dans le dossier du dépôt</td><td><code>cd</code> dans le projet, vérifier avec <code>git rev-parse --show-toplevel</code></td></tr>
+          <tr><td><code>error: failed to push some refs</code></td><td>Idem « fetch first »</td><td>Voir la ligne 1</td></tr>
+          <tr><td><code>fatal: refusing to merge unrelated histories</code></td><td>Deux historiques sans ancêtre commun</td><td>À éviter ; si vraiment voulu : <code>git pull --allow-unrelated-histories</code></td></tr>
+          <tr><td><code>LF will be replaced by CRLF</code></td><td>Fin de ligne Windows/Linux</td><td>Avertissement, pas une erreur ; régler avec <code>.gitattributes</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="dernier-recours">
+      <h2>En dernier recours</h2>
+      <ol>
+        <li>Ne rien taper de destructif.</li>
+        <li><code>git status</code> et <code>git reflog</code> pour comprendre l'état.</li>
+        <li>Copier l'erreur complète et demander à l'équipe (ou chercher le message exact).</li>
+        <li>Si le dépôt local est cassé mais que le travail est poussé : recloner dans un nouveau dossier et récupérer le travail local au besoin.</li>
+      </ol>
+    </section>
+
   </main>
 
 </body>
