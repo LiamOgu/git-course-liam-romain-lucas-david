@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dépannage Git</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #24292f;
+      --muted: #57606a;
+      --border: #d0d7de;
+      --acronym: #f6f8fa;
+      --accent: #0969da;
+      --danger: #b42318;
+      --danger-bg: #fff5f5;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 4rem;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--fg);
+      background: var(--bg);
+    }
+
+    header h1 {
+      margin-bottom: 0.25rem;
+      font-size: 2rem;
+    }
+
+    header > p {
+      margin-top: 0;
+      color: var(--muted);
+    }
+
+    nav {
+      padding: 1rem 1.25rem;
+      margin: 1.5rem 0 2.5rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--acronym);
+    }
+
+    nav h2 {
+      margin: 0 0 0.5rem;
+      font-size: 1rem;
+    }
+
+    nav ul {
+      margin: 0;
+      padding-left: 1.25rem;
+    }
+
+    nav a,
+    main a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    nav a:hover,
+    main a:hover {
+      text-decoration: underline;
+    }
+
+    section {
+      margin-bottom: 2.5rem;
+    }
+
+    section h2 {
+      padding-bottom: 0.3rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    code {
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+      background: var(--acronym);
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.9em;
+    }
+
+    pre {
+      padding: 1rem;
+      border-radius: 6px;
+      background: var(--acronym);
+      overflow-x: auto;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      font-size: 0.875rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+
+    th,
+    td {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+
+    th {
+      background: var(--acronym);
+    }
+
+    blockquote {
+      margin: 1rem 0;
+      padding: 0.5rem 1rem;
+      border-left: 4px solid var(--accent);
+      background: var(--acronym);
+      color: var(--muted);
+    }
+
+    .danger {
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--danger);
+      border-radius: 6px;
+      background: var(--danger-bg);
+      color: var(--danger);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Dépannage Git</h1>
+    <p>Fiche de secours : que faire quand ça part mal. Les commandes sont données pour ce dépôt (branches <code>main</code> et <code>develop</code>).</p>
+  </header>
+
+  <nav>
+    <h2>Sommaire</h2>
+    <ul>
+      <li><a href="#annuler">Je veux annuler quelque chose</a></li>
+      <li><a href="#conflit">Résoudre un conflit</a></li>
+      <li><a href="#corriger-commit">Corriger le dernier commit</a></li>
+      <li><a href="#mauvaise-branche">J'ai commité sur la mauvaise branche</a></li>
+      <li><a href="#annuler-pousse">Annuler un commit déjà poussé</a></li>
+      <li><a href="#travail-perdu">Retrouver du travail perdu</a></li>
+      <li><a href="#stash">Mettre de côté sans commiter</a></li>
+      <li><a href="#head-detache">HEAD détaché</a></li>
+      <li><a href="#erreurs">Erreurs courantes</a></li>
+    </ul>
+  </nav>
+
+  <main>
+
+    <p class="danger">Règle d'or : avant toute commande destructive (<code>reset --hard</code>, <code>push --force</code>, <code>clean -fd</code>), vérifie que ton travail est commité ou stasché. En cas de doute, <code>git status</code> d'abord.</p>
+
+    <section id="annuler">
+      <h2>Je veux annuler quelque chose</h2>
+      <table>
+        <thead>
+          <tr><th>Situation</th><th>Commande</th><th>Effet</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Annuler les modifs d'un fichier non commité</td><td><code>git restore fichier.txt</code></td><td>Écrase le fichier avec la version du dernier commit</td></tr>
+          <tr><td>Retirer un fichier de la zone de staging</td><td><code>git restore --staged fichier.txt</code></td><td>Garde les modifs dans le fichier</td></tr>
+          <tr><td>Annuler le dernier commit, garder les modifs</td><td><code>git reset --soft HEAD~1</code></td><td>Le commit disparaît, les modifs restent stagées</td></tr>
+          <tr><td>Annuler le dernier commit, garder les fichiers non stagés</td><td><code>git reset HEAD~1</code> (ou <code>--mixed</code>)</td><td>Commit annulé, modifs dans le working tree</td></tr>
+          <tr><td>Annuler le dernier commit <strong>et</strong> les modifs</td><td><code>git reset --hard HEAD~1</code></td><td>Perte définitive des modifs non commitées</td></tr>
+          <tr><td>Annuler un commit <strong>sans</strong> réécrire l'historique</td><td><code>git revert &lt;hash&gt;</code></td><td>Crée un commit inverse, sûr si déjà poussé</td></tr>
+        </tbody>
+      </table>
+      <p><code>reset</code> réécrit l'historique (à éviter sur une branche partagée), <code>revert</code> en ajoute (toujours sûr). Voir aussi <a href="#annuler-pousse">Annuler un commit déjà poussé</a>.</p>
+    </section>
+
+    <section id="conflit">
+      <h2>Résoudre un conflit</h2>
+      <p>Un conflit arrive sur <code>merge</code>, <code>rebase</code>, <code>cherry-pick</code> ou <code>pull</code>. Git s'arrête en te disant <code>CONFLICT (content): Merge conflict in &lt;fichier&gt;</code>.</p>
+      <pre><code>git status              # liste les fichiers en conflit
+# ouvrir chaque fichier, repérer les marqueurs :
+#   &lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+#   =======
+#   &gt;&gt;&gt;&gt;&gt;&gt;&gt; autre-branche
+# garder le bon contenu, supprimer les marqueurs
+git add fichier-resolu.txt
+git merge --continue    # ou: git rebase --continue</code></pre>
+      <table>
+        <thead>
+          <tr><th>Commande</th><th>Quand</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>git merge --continue</code></td><td>Reprendre le merge après résolution</td></tr>
+          <tr><td><code>git rebase --continue</code></td><td>Reprendre le rebase après résolution</td></tr>
+          <tr><td><code>git merge --abort</code></td><td>Tout annuler, revenir à l'état d'avant le merge</td></tr>
+          <tr><td><code>git rebase --abort</code></td><td>Tout annuler, revenir à l'état d'avant le rebase</td></tr>
+          <tr><td><code>git checkout --theirs fichier</code></td><td>Garder la version de la branche entrante</td></tr>
+          <tr><td><code>git checkout --ours fichier</code></td><td>Garder la version de la branche courante</td></tr>
+        </tbody>
+      </table>
+      <p>À plusieurs sur le même fichier : résoudre le conflit <strong>à deux</strong> devant l'écran plutôt que seul, et prévenir sur le canal de l'équipe.</p>
+    </section>
+
+    <section id="corriger-commit">
+      <h2>Corriger le dernier commit</h2>
+      <pre><code>git commit --amend              # corriger le message (éditeur)
+git commit --amend -m "message" # corriger le message directement
+git add fichier-oublié.txt
+git commit --amend --no-edit    # ajouter un fichier oublié au dernier commit</code></pre>
+      <blockquote><code>--amend</code> réécrit le commit. Si le commit est déjà poussé sur une branche partagée, il faudra un <code>push --force-with-lease</code> (voir ci-dessous). Sur <code>main</code> ou <code>develop</code> : ne pas le faire, préférer un commit de correction.</blockquote>
+    </section>
+
+    <section id="mauvaise-branche">
+      <h2>J'ai commité sur la mauvaise branche</h2>
+      <p>Les commits sont sur <code>develop</code> alors qu'ils devaient être sur une branche feature. Tant que rien n'est poussé :</p>
+      <pre><code>git branch ma-feature            # créer la branche pointant sur le commit actuel
+git reset --hard origin/develop  # remettre develop à l'état du remote
+git switch ma-feature            # continuer sur la bonne branche</code></pre>
+      <p>Si tu as déjà poussé sur <code>develop</code> : ne réécris rien, <code>git revert</code> le commit fautif.</p>
+    </section>
+
+    <section id="annuler-pousse">
+      <h2>Annuler un commit déjà poussé</h2>
+      <p>Sur une branche partagée (<code>main</code>, <code>develop</code>), la bonne méthode est <code>revert</code> : il n'efface rien, il ajoute un commit qui défait le précédent.</p>
+      <pre><code>git revert &lt;hash&gt;       # annule un commit précis
+git revert HEAD         # annule le dernier commit
+git revert &lt;h1&gt;..&lt;h2&gt;   # annule une plage de commits
+git push</code></pre>
+      <p><code>push --force</code> n'est à utiliser que sur <strong>ta</strong> branche feature, jamais sur <code>main</code>/<code>develop</code>. Si tu dois vraiment forcer, préfère <code>--force-with-lease</code>, qui refuse si quelqu'un a poussé entre-temps :</p>
+      <pre><code>git push --force-with-lease origin ma-feature</code></pre>
+    </section>
+
+    <section id="travail-perdu">
+      <h2>Retrouver du travail perdu</h2>
+      <p><code>reflog</code> garde la trace de tous les déplacements de <code>HEAD</code>, même après un <code>reset --hard</code>. C'est la bouée de secours.</p>
+      <pre><code>git reflog                       # liste des états récents de HEAD
+git reset --hard &lt;hash-du-reflog&gt; # revenir à un état avant la bêtise</code></pre>
+      <p>Repère la ligne qui précède l'erreur, récupère son hash, et ramène la branche dessus.</p>
+    </section>
+
+    <section id="stash">
+      <h2>Mettre de côté sans commiter</h2>
+      <p>Pour changer de branche sans commiter un travail en cours :</p>
+      <pre><code>git stash                 # range les modifs et nettoie le working tree
+git stash -m "wip: formule de paie"  # avec un message
+git stash -u              # inclut les fichiers non suivis (untracked)
+git stash list            # voir les stashs en attente
+git stash pop             # réappliquer le dernier et le supprimer
+git stash apply           # réappliquer sans le supprimer
+git stash drop stash@{0}  # supprimer un stash précis</code></pre>
+    </section>
+
+    <section id="head-detache">
+      <h2>HEAD détaché</h2>
+      <p>Message <code>You are in 'detached HEAD' state</code> : tu as fait un <code>checkout</code> sur un commit ou un tag précis, pas sur une branche.</p>
+      <ul>
+        <li>Tu voulais juste regarder : <code>git switch -</code> (ou <code>git checkout develop</code>) pour revenir.</li>
+        <li>Tu as fait du travail à garder : <code>git switch -c ma-branche</code> crée une branche depuis cet état et sauve tes commits.</li>
+      </ul>
+    </section>
+
+    <section id="erreurs">
+      <h2>Erreurs courantes</h2>
+      <table>
+        <thead>
+          <tr><th>Message</th><th>Cause</th><th>Solution</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>Updates were rejected... fetch first</code></td><td>Le remote a des commits que tu n'as pas</td><td><code>git pull --rebase</code> puis <code>git push</code></td></tr>
+          <tr><td><code>Please commit your changes or stash them</code></td><td>Fichiers modifiés qui bloquent un <code>switch</code>/<code>pull</code></td><td><code>git stash</code>, faire l'opération, <code>git stash pop</code></td></tr>
+          <tr><td><code>fatal: not a git repository</code></td><td>Tu n'es pas dans le dossier du dépôt</td><td><code>cd</code> dans le projet, vérifier avec <code>git rev-parse --show-toplevel</code></td></tr>
+          <tr><td><code>error: failed to push some refs</code></td><td>Idem « fetch first »</td><td>Voir la ligne 1</td></tr>
+          <tr><td><code>fatal: refusing to merge unrelated histories</code></td><td>Deux historiques sans ancêtre commun</td><td>À éviter ; si vraiment voulu : <code>git pull --allow-unrelated-histories</code></td></tr>
+          <tr><td><code>LF will be replaced by CRLF</code></td><td>Fin de ligne Windows/Linux</td><td>Avertissement, pas une erreur ; régler avec <code>.gitattributes</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="dernier-recours">
+      <h2>En dernier recours</h2>
+      <ol>
+        <li>Ne rien taper de destructif.</li>
+        <li><code>git status</code> et <code>git reflog</code> pour comprendre l'état.</li>
+        <li>Copier l'erreur complète et demander à l'équipe (ou chercher le message exact).</li>
+        <li>Si le dépôt local est cassé mais que le travail est poussé : recloner dans un nouveau dossier et récupérer le travail local au besoin.</li>
+      </ol>
+    </section>
+
+  </main>
+
+</body>
+</html>

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Cours pratique sur les principales commandes Git.">
+  <title>Commandes Git | Cours pratique</title>
+  <style>
+    :root {
+      --ink: #17212b;
+      --muted: #5d6b78;
+      --paper: #f7f5f0;
+      --surface: #ffffff;
+      --line: #dce2e5;
+      --accent: #d8583f;
+      --accent-dark: #a93d2e;
+      --accent-soft: #fff0eb;
+      --code: #17212b;
+      --shadow: 0 14px 40px rgba(23, 33, 43, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Georgia, "Times New Roman", serif;
+      line-height: 1.65;
+    }
+
+    header {
+      padding: 72px 6vw 64px;
+      color: #fff;
+      background: linear-gradient(135deg, #17212b 0%, #263d49 62%, #d8583f 160%);
+    }
+
+    .hero, .layout { width: min(1180px, 100%); margin: 0 auto; }
+    .eyebrow {
+      margin: 0 0 12px;
+      color: #ffb09e;
+      font: 700 0.78rem/1.2 "Trebuchet MS", sans-serif;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 { line-height: 1.15; }
+    h1 {
+      max-width: 720px;
+      margin: 0;
+      font-size: clamp(2.5rem, 7vw, 5.6rem);
+      font-weight: 400;
+      letter-spacing: -0.03em;
+    }
+
+    .lead { max-width: 650px; margin: 24px 0 0; color: #e9eef0; font-size: 1.18rem; }
+    .hero-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+    .hero-links a {
+      padding: 9px 14px;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 4px;
+      font: 700 0.85rem "Trebuchet MS", sans-serif;
+      text-decoration: none;
+    }
+    .hero-links a:hover, .hero-links a:focus-visible { background: rgba(255, 255, 255, 0.14); }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: 48px;
+      padding: 56px 24px 80px;
+    }
+
+    nav { position: sticky; top: 24px; align-self: start; }
+    nav p {
+      margin: 0 0 12px;
+      color: var(--accent-dark);
+      font: 700 0.75rem "Trebuchet MS", sans-serif;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    nav a {
+      display: block;
+      padding: 6px 0;
+      color: var(--muted);
+      font: 0.92rem/1.35 "Trebuchet MS", sans-serif;
+      text-decoration: none;
+    }
+    nav a:hover, nav a:focus-visible { color: var(--accent-dark); }
+    main { min-width: 0; }
+    section { scroll-margin-top: 24px; margin-bottom: 56px; }
+    h2 { margin: 0 0 18px; font-size: clamp(1.7rem, 3vw, 2.5rem); font-weight: 400; }
+    h3 { margin: 0 0 10px; font-size: 1.25rem; }
+    p { margin: 0 0 16px; }
+
+    .intro, .card {
+      padding: 24px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    .intro { border-left: 5px solid var(--accent); }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .grid .card { box-shadow: none; }
+    .workflow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 24px 0; }
+    .workflow div {
+      padding: 18px 14px;
+      color: #fff;
+      background: var(--accent);
+      border-radius: 4px;
+      font: 700 0.95rem/1.3 "Trebuchet MS", sans-serif;
+      text-align: center;
+    }
+    .workflow div:nth-child(even) { background: #263d49; }
+
+    code {
+      padding: 2px 5px;
+      color: var(--accent-dark);
+      background: var(--accent-soft);
+      border-radius: 3px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.9em;
+    }
+    pre {
+      overflow-x: auto;
+      margin: 16px 0 24px;
+      padding: 18px 20px;
+      color: #f4f6f7;
+      background: var(--code);
+      border-left: 4px solid var(--accent);
+      border-radius: 4px;
+      font: 0.9rem/1.65 "SFMono-Regular", Consolas, monospace;
+    }
+    pre code { padding: 0; color: inherit; background: transparent; }
+    ul { padding-left: 22px; }
+    li + li { margin-top: 8px; }
+    .note { padding: 16px 18px; color: #713226; background: var(--accent-soft); border-left: 4px solid var(--accent); }
+
+    table { width: 100%; border-collapse: collapse; background: var(--surface); box-shadow: var(--shadow); }
+    th, td { padding: 13px 16px; border-bottom: 1px solid var(--line); text-align: left; }
+    th { color: #fff; background: #263d49; font: 700 0.8rem "Trebuchet MS", sans-serif; text-transform: uppercase; }
+    tr:last-child td { border-bottom: 0; }
+    footer { padding: 28px 24px; color: #dce5e8; background: #17212b; font: 0.85rem "Trebuchet MS", sans-serif; text-align: center; }
+    footer a { color: #ffb09e; }
+
+    @media (max-width: 760px) {
+      header { padding: 48px 24px; }
+      .layout { display: block; padding-top: 32px; }
+      nav {
+        position: static;
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        margin-bottom: 36px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--line);
+      }
+      nav p { display: none; }
+      nav a { flex: 0 0 auto; padding: 5px 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; }
+      .grid, .workflow { grid-template-columns: 1fr; }
+      table { display: block; overflow-x: auto; white-space: nowrap; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hero">
+      <p class="eyebrow">Documentation pratique</p>
+      <h1>Les commandes Git</h1>
+      <p class="lead">Comprendre le cycle de travail, conserver un historique propre et collaborer efficacement sur un projet.</p>
+      <div class="hero-links">
+        <a href="#demarrer">Commencer le cours</a>
+        <a href="commandes.md">Version Markdown</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav aria-label="Sommaire">
+      <p>Sommaire</p>
+      <a href="#demarrer">Démarrer</a>
+      <a href="#cycle">Cycle Git</a>
+      <a href="#branches">Branches</a>
+      <a href="#distant">Dépôt distant</a>
+      <a href="#outils">Outils</a>
+      <a href="#resume">Résumé</a>
+    </nav>
+
+    <main>
+      <section id="demarrer">
+        <div class="intro">
+          <h2>À quoi sert Git ?</h2>
+          <p>Git est un système de gestion de versions distribué. Il enregistre l'évolution d'un projet, facilite le travail en équipe et permet de revenir à une version précédente.</p>
+          <p>Avant de commencer, vérifier l'installation et configurer son identité :</p>
+          <pre><code>git --version
+git config --global user.name "Prénom Nom"
+git config --global user.email "adresse@example.com"</code></pre>
+        </div>
+      </section>
+
+      <section id="cycle">
+        <h2>Le cycle de travail</h2>
+        <p>Git distingue le répertoire de travail, la zone de préparation et le dépôt local. On choisit les modifications à enregistrer avant de créer un commit.</p>
+        <div class="workflow" aria-label="Cycle Git">
+          <div>Modifier</div>
+          <div>Préparer<br><code>git add</code></div>
+          <div>Valider<br><code>git commit</code></div>
+          <div>Partager<br><code>git push</code></div>
+        </div>
+        <div class="grid">
+          <article class="card">
+            <h3>Créer ou récupérer</h3>
+            <pre><code>git init
+git clone URL_DU_PROJET</code></pre>
+            <p><code>init</code> démarre un dépôt local. <code>clone</code> récupère un projet existant et son historique.</p>
+          </article>
+          <article class="card">
+            <h3>Contrôler ses changements</h3>
+            <pre><code>git status
+git diff
+git diff --staged</code></pre>
+            <p>Ces commandes permettent de vérifier l'état du dépôt et le contenu exact des modifications.</p>
+          </article>
+          <article class="card">
+            <h3>Enregistrer</h3>
+            <pre><code>git add fichier.md
+git commit -m "Ajoute la documentation"</code></pre>
+            <p>Un commit doit représenter une modification cohérente et avoir un message explicite.</p>
+          </article>
+          <article class="card">
+            <h3>Consulter l'historique</h3>
+            <pre><code>git log --oneline --graph
+git show</code></pre>
+            <p>L'historique permet de comprendre l'origine d'une modification et de retrouver un commit.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="branches">
+        <h2>Travailler avec les branches</h2>
+        <p>Une branche isole une fonctionnalité ou une correction de la branche principale. Elle évite de mélanger plusieurs travaux en cours.</p>
+        <pre><code>git switch -c nouvelle-fonctionnalite
+git switch main
+git merge nouvelle-fonctionnalite
+git branch -d nouvelle-fonctionnalite</code></pre>
+        <h3>Résoudre un conflit</h3>
+        <p>Lorsqu'une fusion entre en conflit, ouvrir les fichiers signalés, choisir le contenu final, puis valider la résolution :</p>
+        <pre><code>git status
+git add fichier-resolu.md
+git commit
+
+# Annuler une fusion encore en cours
+git merge --abort</code></pre>
+      </section>
+
+      <section id="distant">
+        <h2>Collaborer avec un dépôt distant</h2>
+        <p>Un dépôt distant permet de partager les commits avec les autres membres du projet. Le nom par défaut est généralement <code>origin</code>.</p>
+        <pre><code>git remote -v
+git fetch origin
+git pull origin main
+git push -u origin nouvelle-fonctionnalite</code></pre>
+        <p><code>fetch</code> télécharge les nouvelles références sans modifier les fichiers. <code>pull</code> récupère puis intègre les changements. <code>push</code> publie les commits locaux.</p>
+        <div class="note"><strong>Conseil :</strong> vérifier <code>git status</code> avant un <code>pull</code> et éviter de forcer l'envoi sur une branche partagée.</div>
+      </section>
+
+      <section id="outils">
+        <h2>Outils utiles</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>Mettre son travail de côté</h3>
+            <pre><code>git stash
+git stash list
+git stash pop</code></pre>
+            <p><code>stash</code> sauvegarde temporairement des modifications pour permettre un changement de branche.</p>
+          </article>
+          <article class="card">
+            <h3>Ignorer des fichiers</h3>
+            <pre><code>git rm --cached fichier.env
+git check-ignore -v fichier.log</code></pre>
+            <p>Le fichier <code>.gitignore</code> exclut les fichiers générés, locaux ou contenant des secrets.</p>
+          </article>
+          <article class="card">
+            <h3>Annuler proprement</h3>
+            <pre><code>git restore fichier.md
+git revert IDENTIFIANT_DU_COMMIT</code></pre>
+            <p><code>restore</code> annule une modification locale. <code>revert</code> crée un nouveau commit d'annulation, adapté à un historique partagé.</p>
+          </article>
+          <article class="card">
+            <h3>Retrouver une ancienne position</h3>
+            <pre><code>git reflog</code></pre>
+            <p>Le reflog aide à retrouver une branche ou un commit après un déplacement accidentel de <code>HEAD</code>.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="resume">
+        <h2>Bonnes pratiques et résumé</h2>
+        <ul>
+          <li>Faire des commits petits et cohérents.</li>
+          <li>Vérifier <code>git status</code> et <code>git diff</code> avant chaque commit.</li>
+          <li>Ne jamais versionner de mot de passe, de clé privée ou de fichier <code>.env</code>.</li>
+          <li>Utiliser une branche dédiée pour chaque fonctionnalité ou correction.</li>
+          <li>Préférer <code>git revert</code> pour annuler un commit déjà partagé.</li>
+          <li>Utiliser <code>git help commande</code> pour consulter la documentation intégrée.</li>
+        </ul>
+        <div class="note"><strong>Attention :</strong> <code>git reset --hard</code> supprime les modifications concernées. Vérifier qu'aucun travail utile ne sera perdu avant de l'utiliser.</div>
+        <br>
+        <table>
+          <thead>
+            <tr><th>Besoin</th><th>Commande</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Vérifier l'état</td><td><code>git status</code></td></tr>
+            <tr><td>Ajouter un fichier</td><td><code>git add fichier</code></td></tr>
+            <tr><td>Créer un commit</td><td><code>git commit -m "Message"</code></td></tr>
+            <tr><td>Voir l'historique</td><td><code>git log --oneline</code></td></tr>
+            <tr><td>Créer une branche</td><td><code>git switch -c nom</code></td></tr>
+            <tr><td>Fusionner une branche</td><td><code>git merge nom</code></td></tr>
+            <tr><td>Récupérer les changements</td><td><code>git pull</code></td></tr>
+            <tr><td>Envoyer ses commits</td><td><code>git push</code></td></tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    Cours Git · <a href="commandes.md">Lire aussi la version Markdown</a>
+  </footer>
+</body>
+</html>
