@@ -142,10 +142,76 @@
   <nav>
     <h2>Sommaire</h2>
     <ul>
+      <li><a href="#annuler">Je veux annuler quelque chose</a></li>
+      <li><a href="#conflit">Résoudre un conflit</a></li>
+      <li><a href="#corriger-commit">Corriger le dernier commit</a></li>
+      <li><a href="#mauvaise-branche">J'ai commité sur la mauvaise branche</a></li>
+      <li><a href="#annuler-pousse">Annuler un commit déjà poussé</a></li>
+      <li><a href="#travail-perdu">Retrouver du travail perdu</a></li>
+      <li><a href="#stash">Mettre de côté sans commiter</a></li>
+      <li><a href="#head-detache">HEAD détaché</a></li>
+      <li><a href="#erreurs">Erreurs courantes</a></li>
     </ul>
   </nav>
 
   <main>
+
+    <p class="danger">Règle d'or : avant toute commande destructive (<code>reset --hard</code>, <code>push --force</code>, <code>clean -fd</code>), vérifie que ton travail est commité ou stasché. En cas de doute, <code>git status</code> d'abord.</p>
+
+    <section id="annuler">
+      <h2>Je veux annuler quelque chose</h2>
+      <table>
+        <thead>
+          <tr><th>Situation</th><th>Commande</th><th>Effet</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Annuler les modifs d'un fichier non commité</td><td><code>git restore fichier.txt</code></td><td>Écrase le fichier avec la version du dernier commit</td></tr>
+          <tr><td>Retirer un fichier de la zone de staging</td><td><code>git restore --staged fichier.txt</code></td><td>Garde les modifs dans le fichier</td></tr>
+          <tr><td>Annuler le dernier commit, garder les modifs</td><td><code>git reset --soft HEAD~1</code></td><td>Le commit disparaît, les modifs restent stagées</td></tr>
+          <tr><td>Annuler le dernier commit, garder les fichiers non stagés</td><td><code>git reset HEAD~1</code> (ou <code>--mixed</code>)</td><td>Commit annulé, modifs dans le working tree</td></tr>
+          <tr><td>Annuler le dernier commit <strong>et</strong> les modifs</td><td><code>git reset --hard HEAD~1</code></td><td>Perte définitive des modifs non commitées</td></tr>
+          <tr><td>Annuler un commit <strong>sans</strong> réécrire l'historique</td><td><code>git revert &lt;hash&gt;</code></td><td>Crée un commit inverse, sûr si déjà poussé</td></tr>
+        </tbody>
+      </table>
+      <p><code>reset</code> réécrit l'historique (à éviter sur une branche partagée), <code>revert</code> en ajoute (toujours sûr). Voir aussi <a href="#annuler-pousse">Annuler un commit déjà poussé</a>.</p>
+    </section>
+
+    <section id="conflit">
+      <h2>Résoudre un conflit</h2>
+      <p>Un conflit arrive sur <code>merge</code>, <code>rebase</code>, <code>cherry-pick</code> ou <code>pull</code>. Git s'arrête en te disant <code>CONFLICT (content): Merge conflict in &lt;fichier&gt;</code>.</p>
+      <pre><code>git status              # liste les fichiers en conflit
+# ouvrir chaque fichier, repérer les marqueurs :
+#   &lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+#   =======
+#   &gt;&gt;&gt;&gt;&gt;&gt;&gt; autre-branche
+# garder le bon contenu, supprimer les marqueurs
+git add fichier-resolu.txt
+git merge --continue    # ou: git rebase --continue</code></pre>
+      <table>
+        <thead>
+          <tr><th>Commande</th><th>Quand</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>git merge --continue</code></td><td>Reprendre le merge après résolution</td></tr>
+          <tr><td><code>git rebase --continue</code></td><td>Reprendre le rebase après résolution</td></tr>
+          <tr><td><code>git merge --abort</code></td><td>Tout annuler, revenir à l'état d'avant le merge</td></tr>
+          <tr><td><code>git rebase --abort</code></td><td>Tout annuler, revenir à l'état d'avant le rebase</td></tr>
+          <tr><td><code>git checkout --theirs fichier</code></td><td>Garder la version de la branche entrante</td></tr>
+          <tr><td><code>git checkout --ours fichier</code></td><td>Garder la version de la branche courante</td></tr>
+        </tbody>
+      </table>
+      <p>À plusieurs sur le même fichier : résoudre le conflit <strong>à deux</strong> devant l'écran plutôt que seul, et prévenir sur le canal de l'équipe.</p>
+    </section>
+
+    <section id="corriger-commit">
+      <h2>Corriger le dernier commit</h2>
+      <pre><code>git commit --amend              # corriger le message (éditeur)
+git commit --amend -m "message" # corriger le message directement
+git add fichier-oublié.txt
+git commit --amend --no-edit    # ajouter un fichier oublié au dernier commit</code></pre>
+      <blockquote><code>--amend</code> réécrit le commit. Si le commit est déjà poussé sur une branche partagée, il faudra un <code>push --force-with-lease</code> (voir ci-dessous). Sur <code>main</code> ou <code>develop</code> : ne pas le faire, préférer un commit de correction.</blockquote>
+    </section>
+
   </main>
 
 </body>
