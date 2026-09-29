@@ -212,6 +212,46 @@ git commit --amend --no-edit    # ajouter un fichier oublié au dernier commit</
       <blockquote><code>--amend</code> réécrit le commit. Si le commit est déjà poussé sur une branche partagée, il faudra un <code>push --force-with-lease</code> (voir ci-dessous). Sur <code>main</code> ou <code>develop</code> : ne pas le faire, préférer un commit de correction.</blockquote>
     </section>
 
+    <section id="mauvaise-branche">
+      <h2>J'ai commité sur la mauvaise branche</h2>
+      <p>Les commits sont sur <code>develop</code> alors qu'ils devaient être sur une branche feature. Tant que rien n'est poussé :</p>
+      <pre><code>git branch ma-feature            # créer la branche pointant sur le commit actuel
+git reset --hard origin/develop  # remettre develop à l'état du remote
+git switch ma-feature            # continuer sur la bonne branche</code></pre>
+      <p>Si tu as déjà poussé sur <code>develop</code> : ne réécris rien, <code>git revert</code> le commit fautif.</p>
+    </section>
+
+    <section id="annuler-pousse">
+      <h2>Annuler un commit déjà poussé</h2>
+      <p>Sur une branche partagée (<code>main</code>, <code>develop</code>), la bonne méthode est <code>revert</code> : il n'efface rien, il ajoute un commit qui défait le précédent.</p>
+      <pre><code>git revert &lt;hash&gt;       # annule un commit précis
+git revert HEAD         # annule le dernier commit
+git revert &lt;h1&gt;..&lt;h2&gt;   # annule une plage de commits
+git push</code></pre>
+      <p><code>push --force</code> n'est à utiliser que sur <strong>ta</strong> branche feature, jamais sur <code>main</code>/<code>develop</code>. Si tu dois vraiment forcer, préfère <code>--force-with-lease</code>, qui refuse si quelqu'un a poussé entre-temps :</p>
+      <pre><code>git push --force-with-lease origin ma-feature</code></pre>
+    </section>
+
+    <section id="travail-perdu">
+      <h2>Retrouver du travail perdu</h2>
+      <p><code>reflog</code> garde la trace de tous les déplacements de <code>HEAD</code>, même après un <code>reset --hard</code>. C'est la bouée de secours.</p>
+      <pre><code>git reflog                       # liste des états récents de HEAD
+git reset --hard &lt;hash-du-reflog&gt; # revenir à un état avant la bêtise</code></pre>
+      <p>Repère la ligne qui précède l'erreur, récupère son hash, et ramène la branche dessus.</p>
+    </section>
+
+    <section id="stash">
+      <h2>Mettre de côté sans commiter</h2>
+      <p>Pour changer de branche sans commiter un travail en cours :</p>
+      <pre><code>git stash                 # range les modifs et nettoie le working tree
+git stash -m "wip: formule de paie"  # avec un message
+git stash -u              # inclut les fichiers non suivis (untracked)
+git stash list            # voir les stashs en attente
+git stash pop             # réappliquer le dernier et le supprimer
+git stash apply           # réappliquer sans le supprimer
+git stash drop stash@{0}  # supprimer un stash précis</code></pre>
+    </section>
+
   </main>
 
 </body>
